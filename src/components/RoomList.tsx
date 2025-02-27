@@ -50,8 +50,11 @@ export const RoomList: React.FC = () => {
         if (error) throw error;
 
         // Transform the data to match our Room interface
-        const transformedRooms = (roomsData || []).map(room => ({
-          ...room,
+        const transformedRooms: Room[] = (roomsData || []).map(room => ({
+          id: room.id,
+          name: room.name,
+          instructor_id: room.instructor_id,
+          profiles: room.profiles,
           participant_count: room.participant_count?.[0]?.count || 0
         }));
 
