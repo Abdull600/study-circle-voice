@@ -1,5 +1,6 @@
 
 import { StudyRoom } from "@/components/StudyRoom";
+import { Navbar } from "@/components/Navbar";
 import { useParams } from "react-router-dom";
 
 const Room = () => {
@@ -7,10 +8,13 @@ const Room = () => {
   
   // In a real application, we would fetch room details based on the ID
   return (
-    <StudyRoom
-      roomName="Advanced Mathematics"
-      instructorName="Dr. Smith"
-    />
+    <div>
+      <Navbar />
+      <StudyRoom
+        roomName="Advanced Mathematics"
+        instructorName="Dr. Smith"
+      />
+    </div>
   );
 };
 

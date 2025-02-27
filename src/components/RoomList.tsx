@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '@clerk/clerk-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from './ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Room {
   id: string;
@@ -19,7 +19,7 @@ interface Room {
 
 export const RoomList: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,6 +60,7 @@ export const RoomList: React.FC = () => {
 
         setRooms(transformedRooms);
       } catch (error) {
+        console.error('Error fetching rooms:', error);
         toast({
           title: "Error fetching rooms",
           description: "Please try again later",
@@ -96,7 +97,7 @@ export const RoomList: React.FC = () => {
         .from('rooms')
         .insert([
           { 
-            name: `${user.firstName || 'New'}'s Room`,
+            name: `${user.user_metadata?.full_name || 'New'}'s Room`,
             instructor_id: user.id 
           }
         ])
@@ -108,6 +109,7 @@ export const RoomList: React.FC = () => {
         navigate(`/room/${data.id}`);
       }
     } catch (error) {
+      console.error('Error creating room:', error);
       toast({
         title: "Error creating room",
         description: "Please try again later",
@@ -122,9 +124,14 @@ export const RoomList: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-semibold text-gray-800">Study Circles</h1>
-        <Button onClick={createRoom} className="bg-blue-700 hover:bg-blue-800">
-          Create Room
-        </Button>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-600">
+            Welcome, {user.user_metadata?.full_name || user.email}
+          </span>
+          <Button onClick={createRoom} className="bg-blue-700 hover:bg-blue-800">
+            Create Room
+          </Button>
+        </div>
       </div>
 
       {loading ? (

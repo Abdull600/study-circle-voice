@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ClerkProvider, useUser } from "@clerk/clerk-react";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Room from "./pages/Room";
 import Auth from "./pages/Auth";
@@ -14,13 +14,13 @@ const queryClient = new QueryClient();
 
 // Protected Route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isLoaded, isSignedIn } = useUser();
+  const { user, isLoading } = useAuth();
 
-  if (!isLoaded) {
-    return <div>Loading...</div>;
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
-  if (!isSignedIn) {
+  if (!user) {
     return <Navigate to="/auth" />;
   }
 
@@ -28,15 +28,9 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
-  const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-
-  if (!CLERK_PUBLISHABLE_KEY) {
-    throw new Error("Missing Clerk Publishable Key");
-  }
-
   return (
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -63,8 +57,8 @@ const App = () => {
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
-      </QueryClientProvider>
-    </ClerkProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 };
 
