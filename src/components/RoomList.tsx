@@ -38,7 +38,7 @@ export const RoomList: React.FC = () => {
             id,
             name,
             instructor_id,
-            profiles!rooms_instructor_id_fkey (
+            profiles (
               full_name
             ),
             participant_count:room_participants (
