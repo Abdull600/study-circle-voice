@@ -9,7 +9,86 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      room_participants: {
+        Row: {
+          has_raised_hand: boolean
+          id: string
+          is_muted: boolean
+          joined_at: string
+          role: Database["public"]["Enums"]["user_role"]
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          has_raised_hand?: boolean
+          id?: string
+          is_muted?: boolean
+          joined_at?: string
+          role: Database["public"]["Enums"]["user_role"]
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          has_raised_hand?: boolean
+          id?: string
+          is_muted?: boolean
+          joined_at?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_participants_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          created_at: string
+          id: string
+          instructor_id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          instructor_id: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          instructor_id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +97,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "instructor" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
