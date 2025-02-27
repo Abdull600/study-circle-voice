@@ -11,9 +11,9 @@ interface Room {
   id: string;
   name: string;
   instructor_id: string;
-  profile: {
-    full_name: string;
-  };
+  profiles: {
+    full_name: string | null;
+  } | null;
   participant_count: number;
 }
 
@@ -35,15 +35,27 @@ export const RoomList: React.FC = () => {
         const { data: roomsData, error } = await supabase
           .from('rooms')
           .select(`
-            *,
-            profile:profiles(full_name),
-            participant_count:room_participants(count)
+            id,
+            name,
+            instructor_id,
+            profiles!rooms_instructor_id_fkey (
+              full_name
+            ),
+            participant_count:room_participants (
+              count
+            )
           `)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        setRooms(roomsData || []);
+        // Transform the data to match our Room interface
+        const transformedRooms = (roomsData || []).map(room => ({
+          ...room,
+          participant_count: room.participant_count?.[0]?.count || 0
+        }));
+
+        setRooms(transformedRooms);
       } catch (error) {
         toast({
           title: "Error fetching rooms",
@@ -135,7 +147,7 @@ export const RoomList: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <p className="text-gray-600 mb-4">Instructor: {room.profile?.full_name}</p>
+                <p className="text-gray-600 mb-4">Instructor: {room.profiles?.full_name || 'Unknown'}</p>
                 <p className="text-gray-500 mb-6">{room.participant_count} participants</p>
                 <Button
                   onClick={() => navigate(`/room/${room.id}`)}
